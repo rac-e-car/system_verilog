@@ -44,7 +44,7 @@ module state_four;
     $display ("Initialized value integer type = %0d", integerr );
   $display ("Initialized value logic type = %0d", logicc );
     $display ("Initialized value time type = %0d", timee );
-              $display ("Initialized value real type = %0d", reall );
+    $display ("Initialized value real type = %f", reall );
   
 $finish;
   end
