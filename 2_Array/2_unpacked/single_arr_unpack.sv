@@ -36,3 +36,20 @@ module unpacked_array;
     end
   
 endmodule
+
+/* OUTPUT
+
+============unpacked array=============
+ 
+The value in element 0 is 110110
+The value in element 1 is 111110
+The value in element 2 is 1000100
+ 
+The value in element 0 is 1100101
+The value in element 1 is 1100001
+The value in element 2 is 1100111
+The value in element 3 is 1101100
+The value in element 4 is 1100101
+ 
+the string value of tries is eagle
+*/
