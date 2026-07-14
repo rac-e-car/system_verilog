@@ -1,0 +1,23 @@
+Started at time 0
+clk is toggling 45000
+[PASS] After_reset ------------------- unlock[0]-(exp 0) | alarm[0]-(exp 0)
+[PASS] Entered_correct_password ------------------- unlock[1]-(exp 1) | alarm[0]-(exp 0)
+[PASS] Wrong_attempt-1 ------------------- unlock[0]-(exp 0) | alarm[0]-(exp 0)
+[PASS] Wrong_attempt-2 ------------------- unlock[0]-(exp 0) | alarm[0]-(exp 0)
+[PASS] Wrong_attempt-3 ------------------- unlock[0]-(exp 0) | alarm[0]-(exp 0)
+[PASS] ALARM ON - Wrong_attempt-4 ------------------- unlock[0]-(exp 0) | alarm[1]-(exp 1)
+[PASS] Cleared using reset ------------------- unlock[0]-(exp 0) | alarm[0]-(exp 0)
+[PASS] correct_password_after_mid_reset ------------------- unlock[1]-(exp 1) | alarm[0]-(exp 0)
+
+----------Result_Log [associative array]----------
+PASS for ALARM ON - Wrong_attempt-4
+PASS for After_reset
+PASS for Cleared using reset
+PASS for Entered_correct_password
+PASS for Wrong_attempt-1
+PASS for Wrong_attempt-2
+PASS for Wrong_attempt-3
+PASS for correct_password_after_mid_reset
+
+8 test(s) PASSED | 0 test(s) failed, total tests = 8
+ALL TEST CASES PASSED
