@@ -1,0 +1,72 @@
+## Smart Digital Door Lock — Project Description
+
+### Overview
+A parameterized digital door lock system implemented in SystemVerilog, designed to simulate the behavior of a real-world electronic lock. 
+  The project covers RTL design, interface modeling, and functional verification using a self-checking testbench.
+
+---
+
+### System Architecture
+
+Three files form the complete system:
+
+- **`lock_inf.sv`** — Parameterized interface connecting the DUT and testbench
+- **`lock_dut.sv`** — RTL design of the lock (synthesizable)
+- **`lock_tb.sv`** — Self-checking testbench that verifies lock behavior
+
+---
+
+### DUT Features
+
+- Accepts a configurable number of hex digits (`NUM_DIGITS`) of configurable width (`DIGIT_WIDTH`) as the password entry
+- Password is hardcoded internally as a `localparam` — unreachable and unmodifiable from outside the DUT
+- Three-phase FSM controlling lock behavior:
+    - `PH_COLLECT` — receives digits one per clock cycle
+    - `PH_EVAL` — compares entered password against stored password one cycle after the last digit
+    - `PH_ALARMED` — locks out permanently after `MAX_FAILS` consecutive wrong attempts; only a hardware reset recovers it
+- Consecutive wrong attempt counter saturates at `MAX_FAILS` — no silent wraparound
+- Synchronous reset clears all internal state and outputs
+
+---
+
+### Interface Features
+
+- Parameterized with `DIGIT_WIDTH` and `NUM_DIGITS` — all sizing derived from these two values; no duplication across files
+- Clocking block (`cb`) with `input #1step` for glitch-free output sampling
+- Separate `dut` and `tb` modports enforcing signal ownership — prevents multi-driver conflicts
+- Built-in tasks: `send_digit`, `send_password`, `do_reset` — driven at negedge for correct setup time before posedge sampling
+- Built-in function `get_nibble` — extracts one digit from a packed password word
+
+---
+
+### Testbench Features
+
+- **Self-checking** — every test case has an expected `unlock` and `alarm` value; pass/fail is decided automatically without waveform inspection
+- **Queue-driven** — test cases stored in a `queue[$]` and iterated with `foreach`
+- **Result logging** — associative array (`bit result_log[string]`) maps test name to pass/fail; printed as a summary at the end
+- **Timeout watchdog** — `fork-join_any` runs a cycle counter in parallel with the test sequence; kills simulation if any task hangs
+- **Struct-based test case** — `typedef struct` bundles password, expected unlock, and expected alarm into one reusable type
+
+---
+
+### SV Concepts Covered
+
+| Category | Concepts Used |
+|---|---|
+| Data types | `logic` (4-state), `bit` (2-state), `struct packed`, `enum`, `localparam`, `typedef` |
+| Arrays | Queue (`[$]`), Associative array (`[string]`) |
+| Interface | Parameterized interface, modport, clocking block, interface tasks, interface function |
+| Control flow | `priority if`, `foreach`, `for`, `case` (via enum comparison) |
+| Processes | `fork-join_any`, `disable fork`, `event` |
+| Tasks & Functions | `automatic` task, `automatic` function, `void` function, task calling function |
+| Operators | Shift (`<<`), bitwise OR (`\|`), part-select (`[i*W +: W]`), case equality (`===`), width cast (`W'(val)`) |
+| Timing | `@(posedge clk)`, `@(negedge clk)`, `#1step`, nonblocking assignment (`<=`) |
+
+---
+
+### Design Decisions Worth Noting
+
+- `DIGIT_WIDTH` and `NUM_DIGITS` live only in the interface — DUT reads them via `inf.DIGIT_WIDTH` and `inf.NUM_DIGITS`, eliminating parameter duplication
+- `VALID_PASSWORD` and `MAX_FAILS` are intentionally separated — password is DUT-internal (security), `MAX_FAILS` is a DUT behavioral parameter
+- Negedge driving was chosen over clocking block output driving for tool compatibility across Questa, VCS, Xcelium, and Verilator
+- The TB's `CORRECT_PASSWORD` is independent of the DUT's internal password — the TB tests behavior through outputs only, not by reading internal state
